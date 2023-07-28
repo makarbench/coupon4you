@@ -146,10 +146,12 @@ USE_TZ = True
 
 # settings.py
 
+# Определите URL для статических файлов
 STATIC_URL = '/static/'
 
 # Определите путь к статическим файлам для развертывания в продакшн-среде на Heroku
-STATIC_ROOT = os.path.join(BASE_DIR, '/static/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 
 
 
