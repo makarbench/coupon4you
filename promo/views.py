@@ -53,8 +53,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)  # Разрешение CORS для всех маршрутов
 
-
-
 import sys
 from promo.action.promocode import get_promo_by_site
 sys.path.append("../promo/action/promocode.py")
