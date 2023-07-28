@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-taqb=0^!8$-r7v$-535#u^eb#*s97443$tg$59$v2b%sfoyjna
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['*.herokuapp.com',
+ALLOWED_HOSTS = ['*',
                 '127.0.0.1',
                  'chrome-extension://lkjcpgjjhggkdoojacjnhckaofljnjkn',
                  'chrome-extension://koghiapaagjoioohnieameekalpfeekk',]
