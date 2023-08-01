@@ -24,7 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-taqb=0^!8$-r7v$-535#u^eb#*s97443$tg$59$v2b%sfoyjna'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
+
 
 ALLOWED_HOSTS = ['coupon4you-81562532bbac.herokuapp.com',
                 '127.0.0.1',
@@ -70,6 +71,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_HEADERS = [
     'Authorization',
 ]
+
 
 CSRF_TRUSTED_ORIGINS = [
     'chrome-extension://lkjcpgjjhggkdoojacjnhckaofljnjkn',
@@ -149,7 +151,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Default primary key field type

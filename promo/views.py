@@ -12,8 +12,6 @@ import string
 from bs4 import BeautifulSoup
 from django.shortcuts import render
 from django.db import connection
-from django.views.decorators.csrf import csrf_exempt
-
 
 
 
@@ -65,20 +63,14 @@ def extension_data_view(request):
     if request.method == 'POST':
         body = json.loads(request.body)
         payload_url = body.get('url')
-        result = get_promo_by_site(payload_url).get_promo_from_sqllite()
-        #print("Итоговые url", result)
-       #print("Список ", payload_url)
-       #characters = string.ascii_letters + string.digits
-        #random_code_1 = ''.join(random.choice(characters) for _ in range(6))
-       # random_code_2 = ''.join(random.choice(characters) for _ in range(6))
-       # random_code_3 = ''.join(random.choice(characters) for _ in range(6))
-        #promocode = payload_url + " " + random_code
-        #promocode = {'Скидка 50% на все': random_code_1, 'Кэшбэк': random_code_2, 'Возьми 2 3 с подарок': random_code_3}
-        #print("Полученный URL и его промокод ", promocode)
-        return JsonResponse({'message': result})
+        promo_site = get_promo_by_site(payload_url, request)
+        result, image_url = promo_site.get_promo_from_sqllite()
+        print("Доступные промокоды", result)
+        print("Логотип рекламодателя: ", image_url)
+        return JsonResponse({'message': result, 'image_url': image_url})
         #return JsonResponse({'message': 'Invalid request method'})
     else:
-        return JsonResponse({'message': 'Invalid request method'})
+        return JsonResponse({'message': 'Invalid request method', 'image_url': 'Invalid request method'})
 
 
 if __name__ == '__main__':
