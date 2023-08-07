@@ -83,6 +83,7 @@ class Promocode(models.Model):
     promocode_entity = models.CharField(max_length=20, null=True)
     promocode_url = models.CharField(max_length=500, null=True)
     promocode_decription = models.CharField(max_length=200, null=True)
+    promocode_image = models.ImageField(upload_to='promocodeimages/', null=True, blank=True)
     advertiser = models.ForeignKey(Advertiser, on_delete=models.SET_NULL, null=True,blank=True)
     promo_company_name = models.ForeignKey(PromoCompany, on_delete=models.SET_NULL, null=True)
     promocode_valid_from = models.DateField(null=True, blank=True)
@@ -115,5 +116,42 @@ class Promocode(models.Model):
         return reverse('promocode-detail', args=[str(self.id)])
 
 
+class HotDealsAffiliateLink(models.Model):
+    """
+    Model representing a specific server (i.e. that can be part of project).
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="Unique ID for promocode")
+    affiliatelink_advertiser_url = models.CharField(max_length=500, null=True) #то что показываем пользователю
+    affiliatelink_cpa_url = models.CharField(max_length=500, null=True) #то на что именно кликает пользователь
+    affiliatelink_image = models.ImageField(upload_to='affiliatelinkimages/', null=True, blank=True)
+    affiliatelink_decription = models.TextField(null=True)
+    advertiser = models.ForeignKey(Advertiser, on_delete=models.SET_NULL, null=True,blank=True)
+    affiliatelink_valid_from = models.DateField(null=True, blank=True)
+    affiliatelink_valid_to = models.DateField(null=True, blank=True)
 
+
+    affiliatelink_STATUS = (
+        ('on', 'Turn On'),
+        ('off', 'Turn Off'),
+    )
+
+    status = models.CharField(max_length=3, choices=affiliatelink_STATUS, blank=True, default='on', help_text='affiliatelink Turn On')
+
+    class Meta:
+        ordering = ["status","affiliatelink_valid_from","affiliatelink_valid_to"]
+        permissions = (
+            ("can_mark_turn_status_ affiliatelink", "Set affiliatelink turn on/off status"),
+            ("can_change_affiliatelink", "Change affiliatelink"),)
+
+    def __str__(self):
+        """
+        String for representing the Model object
+        """
+        return '%s (%s) %s  %s' % (self.advertiser,self.affiliatelink_cpa_url, self.affiliatelink_advertiser_url , self.affiliatelink_decription)
+
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular server instance.
+        """
+        return reverse('affiliatelink-detail', args=[str(self.id)])
 

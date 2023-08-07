@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.db import connection
 import tldextract
 from django.db.models import Q
-from promo.models import Advertiser
+from promo.models import Advertiser, HotDealsAffiliateLink
 
 class get_promo_by_site:
 
@@ -34,4 +34,37 @@ class get_promo_by_site:
         #print("Result: ",results," URL: ",image_url)
         return results, image_url
 
+
+class get_affiliatelink_by_site:
+
+    def __init__(self, url, request):
+        self.url = url
+        self.request = request
+
+    def get_affiliatelink_from_sqllite(self):
+        url = self.url
+        extracted_domain = tldextract.extract(url)
+        main_domain = extracted_domain.domain + "." + extracted_domain.suffix
+        sqlreq = f"""
+        SELECT id, affiliatelink_cpa_url, affiliatelink_decription, 
+        affiliatelink_image FROM promo_hotdealsaffiliatelink 
+        WHERE status IS "on" and affiliatelink_advertiser_url like '%{main_domain}%'"""
+
+        with connection.cursor() as cursor:
+            cursor.execute(sqlreq)
+            results_affiliate_links = cursor.fetchall()
+
+        result_image_map = {}
+        for result in results_affiliate_links:
+            instance = get_object_or_404(HotDealsAffiliateLink, id=result[0])
+            if instance and instance.affiliatelink_image:
+                image_url_affiliate_link = self.request.build_absolute_uri(instance.affiliatelink_image.url)
+            else:
+                image_url_affiliate_link = None
+
+            # Convert the tuple to a string before using it as a key
+            result_string = str(result)
+            result_image_map[result_string] = image_url_affiliate_link
+
+        return result_image_map
 

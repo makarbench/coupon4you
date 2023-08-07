@@ -55,6 +55,9 @@ import sys
 from promo.action.promocode import get_promo_by_site
 sys.path.append("../promo/action/promocode.py")
 
+from promo.action.promocode import get_affiliatelink_by_site
+sys.path.append("../promo/action/promocode.py")
+
 @csrf_exempt #отключаем csrf защиту для
 # данных получаемых с расширения, т.к. сейчас передачи конфиденциальных данных не будет.
 # если добавлю авторизацию, то будем использовать  Django REST Framework или JWT
@@ -65,12 +68,20 @@ def extension_data_view(request):
         payload_url = body.get('url')
         promo_site = get_promo_by_site(payload_url, request)
         result, image_url = promo_site.get_promo_from_sqllite()
+        affiliatelink_site = get_affiliatelink_by_site(payload_url, request)
+        result_image_map = affiliatelink_site.get_affiliatelink_from_sqllite()
         print("Доступные промокоды", result)
         print("Логотип рекламодателя: ", image_url)
-        return JsonResponse({'message': result, 'image_url': image_url})
+        print("Партнерска ссылка ", result_image_map)
+        return JsonResponse({'message': result,
+                             'image_url': image_url,
+                             'message_aflink': result_image_map})
         #return JsonResponse({'message': 'Invalid request method'})
     else:
-        return JsonResponse({'message': 'Invalid request method', 'image_url': 'Invalid request method'})
+        return JsonResponse({'message': 'Invalid request method',
+                             'image_url': 'Invalid request method',
+                             'message_aflink': 'Invalid request method'
+                             })
 
 
 if __name__ == '__main__':
