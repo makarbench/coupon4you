@@ -15,12 +15,16 @@ class get_promo_by_site:
         extracted_domain = tldextract.extract(url)
         main_domain = extracted_domain.domain + "." + extracted_domain.suffix
         sqlreq = f"""
-        SELECT promocode_url, promocode_entity, promocode_decription FROM promo_promocode 
-        WHERE status IS 'on' and promocode_url like '%{main_domain}%'"""
+            SELECT promocode_url, promocode_entity, promocode_decription FROM promo_promocode 
+            WHERE status IS 'on' 
+            AND promocode_url like '%{main_domain}%'
+            AND CURRENT_DATE BETWEEN promocode_valid_from AND promocode_valid_to"""
         url_sqlreq = f"""
-        SELECT promo_advertiser.id FROM promo_promocode
-        inner join promo_advertiser on promo_promocode.advertiser_id = promo_advertiser.id
-        WHERE status IS 'on' and promocode_url like '%{main_domain}%'"""
+            SELECT promo_advertiser.id FROM promo_promocode
+            inner join promo_advertiser on promo_promocode.advertiser_id = promo_advertiser.id
+            WHERE status IS 'on' 
+            AND promocode_url like '%{main_domain}%'
+            AND CURRENT_DATE BETWEEN promocode_valid_from AND promocode_valid_to"""
         with connection.cursor() as cursor:
             cursor.execute(sqlreq)
             results = cursor.fetchall()
@@ -31,7 +35,7 @@ class get_promo_by_site:
                 image_url = self.request.build_absolute_uri(instance.advertiser_image.url)
             else:
                 image_url = None
-        #print("Result: ",results," URL: ",image_url)
+        print("Result: ",results," URL: ",image_url)
         return results, image_url
 
 
@@ -48,7 +52,8 @@ class get_affiliatelink_by_site:
         sqlreq = f"""
         SELECT id, affiliatelink_cpa_url, affiliatelink_decription, 
         affiliatelink_image FROM promo_hotdealsaffiliatelink 
-        WHERE status IS "on" and affiliatelink_advertiser_url like '%{main_domain}%'"""
+        WHERE status IS "on" and affiliatelink_advertiser_url like '%{main_domain}%'
+        AND CURRENT_DATE BETWEEN affiliatelink_valid_from AND affiliatelink_valid_to"""
 
         with connection.cursor() as cursor:
             cursor.execute(sqlreq)
