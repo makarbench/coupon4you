@@ -81,7 +81,8 @@ class Promocode(models.Model):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="Unique ID for promocode")
     promocode_entity = models.CharField(max_length=20, null=True)
-    promocode_url = models.CharField(max_length=500, null=True)
+    promocode_url = models.CharField(max_length=500, null=True) # ссылка сайта рекламодателя
+    promocode_cpa_url = models.CharField(max_length=500, null=True)  # партнерская ссылка
     promocode_decription = models.CharField(max_length=200, null=True)
     promocode_image = models.ImageField(upload_to='promocodeimages/', null=True, blank=True)
     advertiser = models.ForeignKey(Advertiser, on_delete=models.SET_NULL, null=True,blank=True)
@@ -121,7 +122,7 @@ class HotDealsAffiliateLink(models.Model):
     Model representing a specific server (i.e. that can be part of project).
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="Unique ID for promocode")
-    affiliatelink_advertiser_url = models.CharField(max_length=500, null=True) #то что показываем пользователю
+    affiliatelink_advertiser_url = models.CharField(max_length=500, null=True) #ссылка сайта рекламодателя
     affiliatelink_cpa_url = models.CharField(max_length=500, null=True) #то на что именно кликает пользователь
     affiliatelink_image = models.ImageField(upload_to='affiliatelinkimages/', null=True, blank=True)
     affiliatelink_decription = models.TextField(null=True)

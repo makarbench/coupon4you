@@ -15,8 +15,8 @@ class get_promo_by_site:
         extracted_domain = tldextract.extract(url)
         main_domain = extracted_domain.domain + "." + extracted_domain.suffix
         sqlreq = f"""
-            SELECT promocode_url, promocode_entity, promocode_decription FROM promo_promocode 
-            WHERE status IS 'on' 
+            SELECT promocode_cpa_url, promocode_entity, promocode_decription FROM promo_promocode 
+            WHERE status IS 'on'   
             AND promocode_url like '%{main_domain}%'
             AND CURRENT_DATE BETWEEN promocode_valid_from AND promocode_valid_to"""
         url_sqlreq = f"""

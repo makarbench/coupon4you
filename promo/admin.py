@@ -56,7 +56,7 @@ class PromoCompanyAdmin(admin.ModelAdmin):
 @admin.register(Promocode)
 class PromocodeAdmin(admin.ModelAdmin):
     #form = PromocodeForm
-    list_display = ('id', 'advertiser', 'promocode_decription', 'promocode_url', 'promocode_entity', 'get_status_display',
+    list_display = ('id', 'advertiser', 'promocode_decription', 'promocode_cpa_url', 'promocode_url',  'promocode_entity', 'get_status_display',
                     'promocode_valid_from', 'promocode_valid_to')
     pass
     # fields = ['id', 'server_name',  ('ip_address', 'port','server_username'),'Project', 'description', 'due_back', 'status']
