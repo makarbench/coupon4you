@@ -20,7 +20,7 @@ class AdvertiserAdmin(admin.ModelAdmin):
 
     fields = ['advertiser_name', 'advertiser_contact_manager_name', ('advertiser_contact_email','advertiser_contact_phone'),
              'advertiser_image','advertiser_country']
-    inlines = [PromoCompanyInline, AffiliateLinkInline]
+    inlines = [PromoCompanyInline, AffiliateLinkInline, PromocodeInline]
 
 
     pass
