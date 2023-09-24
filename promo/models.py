@@ -13,6 +13,8 @@ class Advertiser(models.Model):
                           help_text="Unique ID for this particular advertiser")
     advertiser_name = models.CharField(max_length=50)
     advertiser_image = models.ImageField(upload_to='avertiserimages/', null=True, blank=True)
+    advertiser_image_url = models.CharField(max_length=500, null=True,blank=True) # ссылка изображение если его берем с CDN
+    advertiser_image_aws = models.ImageField(upload_to='images/', null=True,  blank=True)  # upload_to - папка для хранения файлов на S3
     advertiser_contact_manager_name = models.CharField(max_length=50)
     advertiser_contact_email = models.EmailField(max_length=254, null=True)
     advertiser_contact_phone = models.CharField(max_length=50, null=True)

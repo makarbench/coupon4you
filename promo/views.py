@@ -67,15 +67,16 @@ def extension_data_view(request):
         body = json.loads(request.body)
         payload_url = body.get('url')
         promo_site = get_promo_by_site(payload_url, request)
-        result, image_url = promo_site.get_promo_from_sqllite()
+        result, advertiser_image = promo_site.get_promo_from_sqllite()
         affiliatelink_site = get_affiliatelink_by_site(payload_url, request)
-        result_image_map = affiliatelink_site.get_affiliatelink_from_sqllite()
+        hotdeal_result = affiliatelink_site.get_affiliatelink_from_sqllite()
+        advertiser_image = advertiser_image[0]
         print("Доступные промокоды", result)
-        print("Логотип рекламодателя: ", image_url)
-        print("Партнерска ссылка ", result_image_map)
+        print("Логотип рекламодателя: ", advertiser_image)
+        print("Горячая сделка ", hotdeal_result)
         return JsonResponse({'message': result,
-                             'image_url': image_url,
-                             'message_aflink': result_image_map})
+                             'image_url': advertiser_image,
+                             'message_aflink': hotdeal_result})
         #return JsonResponse({'message': 'Invalid request method'})
     else:
         return JsonResponse({'message': 'Invalid request method',

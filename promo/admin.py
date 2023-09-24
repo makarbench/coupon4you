@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 
 # Register your models here.
 from .models import Advertiser, PromoCompany, Promocode, HotDealsAffiliateLink
@@ -14,21 +15,27 @@ class PromocodeInline(admin.TabularInline):
 class AffiliateLinkInline(admin.TabularInline):
     model = HotDealsAffiliateLink
 
+
+class AdvertiserAdminForm(forms.ModelForm):
+    class Meta:
+        model = Advertiser
+        fields = '__all__'
+
 class AdvertiserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'advertiser_name','advertiser_contact_manager_name', 'advertiser_contact_email','advertiser_contact_phone',
-                    'advertiser_country',)
-
-    fields = ['advertiser_name', 'advertiser_contact_manager_name', ('advertiser_contact_email','advertiser_contact_phone'),
-             'advertiser_image','advertiser_country']
+    list_display = ('id', 'advertiser_name', 'advertiser_contact_manager_name', 'advertiser_contact_email', 'advertiser_contact_phone', 'advertiser_country')
     inlines = [PromoCompanyInline, AffiliateLinkInline, PromocodeInline]
+    form = AdvertiserAdminForm
 
+    fieldsets = (
+        (None, {
+            'fields': ('advertiser_name', 'advertiser_contact_manager_name', ('advertiser_contact_email', 'advertiser_contact_phone'), 'advertiser_country')
+        }),
+        ('Images', {
+            'fields': ('advertiser_image', 'advertiser_image_url', 'advertiser_image_aws'),
+        }),
+    )
 
-    pass
-
-
-# Register the admin class with the associated model
 admin.site.register(Advertiser, AdvertiserAdmin)
-
 
 
 

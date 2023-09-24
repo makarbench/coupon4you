@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import dj_database_url
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -114,9 +115,12 @@ DATABASES = {
 }
 '''
 
+DATABASE_URL = 'postgres://ngeiwaiirdahqr:19cd5ed76e9d55da19bbcd7fe28c381720a6e7a6e98ed352b65a2c451c906ead@ec2-3-248-141-201.eu-west-1.compute.amazonaws.com:5432/dd27fudd0p015l'
+
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('postgres://gyfhfsxnzabolo:38d23e7f1c16bf51225749439ca94aa9475866b6e13be820d5a61e65c9a980f0@ec2-34-242-199-141.eu-west-1.compute.amazonaws.com:5432/d56qfrlu8r40jj'))
+    'default': dj_database_url.config(default=DATABASE_URL)
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -159,6 +163,26 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Импортируйте библиотеку boto3
+import boto3
+
+# Настройки для Amazon S3
+AWS_ACCESS_KEY_ID = 'AKIAWS7CLUU2EGIUQBWE'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'takeyourpromo'
+
+# Настройте хранилище для статических и медиа файлов
+STATIC_URL = '/static/'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+MEDIA_URL = '/media/'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+# Настройки для автоматического добавления префикса к именам файлов
+AWS_LOCATION = 'media'
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{AWS_LOCATION}/'
 
 
 # Default primary key field type

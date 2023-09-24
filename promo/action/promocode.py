@@ -4,6 +4,7 @@ import tldextract
 from django.db.models import Q
 from promo.models import Advertiser, HotDealsAffiliateLink
 
+
 class get_promo_by_site:
 
     def __init__(self, url, request):
@@ -14,29 +15,49 @@ class get_promo_by_site:
         url = self.url
         extracted_domain = tldextract.extract(url)
         main_domain = extracted_domain.domain + "." + extracted_domain.suffix
-        sqlreq = f"""
-            SELECT promocode_cpa_url, promocode_entity, promocode_decription FROM promo_promocode 
-            WHERE status IS 'on'   
-            AND promocode_url like '%{main_domain}%'
-            AND CURRENT_DATE BETWEEN promocode_valid_from AND promocode_valid_to"""
-        url_sqlreq = f"""
-            SELECT promo_advertiser.id FROM promo_promocode
-            inner join promo_advertiser on promo_promocode.advertiser_id = promo_advertiser.id
-            WHERE status IS 'on' 
-            AND promocode_url like '%{main_domain}%'
-            AND CURRENT_DATE BETWEEN promocode_valid_from AND promocode_valid_to"""
+
+        sqlreq = """
+            SELECT promocode_cpa_url, promocode_entity, promocode_decription
+            FROM promo_promocode 
+            WHERE status = 'on'   
+            AND promocode_url LIKE %s
+            AND CURRENT_DATE BETWEEN promocode_valid_from AND promocode_valid_to
+        """
+
+        url_sqlreq = """
+                    SELECT promo_advertiser.id
+                    FROM promo_promocode
+                    INNER JOIN promo_advertiser ON promo_promocode.advertiser_id = promo_advertiser.id
+                    WHERE status = 'on' 
+                    AND promocode_url LIKE %s
+                    AND CURRENT_DATE BETWEEN promocode_valid_from AND promocode_valid_to
+                """
+
+        advertiser_image = """
+                            SELECT promo_advertiser.advertiser_image_url
+                            FROM promo_promocode
+                            INNER JOIN promo_advertiser ON promo_promocode.advertiser_id = promo_advertiser.id
+                            WHERE promocode_url LIKE %s
+
+                        """
+
         with connection.cursor() as cursor:
-            cursor.execute(sqlreq)
+            cursor.execute(sqlreq, [f'%{main_domain}%'])
             results = cursor.fetchall()
-            cursor.execute(url_sqlreq)
+            cursor.execute(url_sqlreq, [f'%{main_domain}%'])
             image_data = cursor.fetchone()
+            cursor.execute(advertiser_image , [f'%{main_domain}%'])
+            advertiser_image = cursor.fetchall()
+            print("Наша ссылка", advertiser_image)
+
             if image_data:
                 instance = get_object_or_404(Advertiser, id=image_data[0])
-                image_url = self.request.build_absolute_uri(instance.advertiser_image.url)
+                image_url = instance.advertiser_image.url if instance.advertiser_image else None
             else:
                 image_url = None
-        print("Result: ",results," URL: ",image_url)
-        return results, image_url
+
+        print("Result: ", results, " URL: ", advertiser_image)
+        return results, advertiser_image
 
 
 class get_affiliatelink_by_site:
@@ -49,27 +70,26 @@ class get_affiliatelink_by_site:
         url = self.url
         extracted_domain = tldextract.extract(url)
         main_domain = extracted_domain.domain + "." + extracted_domain.suffix
-        sqlreq = f"""
-        SELECT id, affiliatelink_cpa_url, affiliatelink_decription, 
-        affiliatelink_image FROM promo_hotdealsaffiliatelink 
-        WHERE status IS "on" and affiliatelink_advertiser_url like '%{main_domain}%'
-        AND CURRENT_DATE BETWEEN affiliatelink_valid_from AND affiliatelink_valid_to"""
+
+        sqlreq = """
+            SELECT id, affiliatelink_cpa_url, affiliatelink_decription, affiliatelink_image
+            FROM promo_hotdealsaffiliatelink 
+            WHERE status = 'on' AND affiliatelink_advertiser_url LIKE %s
+            AND CURRENT_DATE BETWEEN affiliatelink_valid_from AND affiliatelink_valid_to
+        """
 
         with connection.cursor() as cursor:
-            cursor.execute(sqlreq)
-            results_affiliate_links = cursor.fetchall()
+            cursor.execute(sqlreq, [f'%{main_domain}%'])
+            hotdeal_result = cursor.fetchall()
 
-        result_image_map = {}
-        for result in results_affiliate_links:
-            instance = get_object_or_404(HotDealsAffiliateLink, id=result[0])
-            if instance and instance.affiliatelink_image:
-                image_url_affiliate_link = self.request.build_absolute_uri(instance.affiliatelink_image.url)
-            else:
-                image_url_affiliate_link = None
+            #cursor.execute(url_sqlreq, [f'%{main_domain}%'])
+            #image_data = cursor.fetchone()
 
-            # Convert the tuple to a string before using it as a key
-            result_string = str(result)
-            result_image_map[result_string] = image_url_affiliate_link
+            #if image_data:
+              #  instance = get_object_or_404(Advertiser, id=image_data[0])
+              #  image_url = instance.advertiser_image.url if instance.advertiser_image else None
+          #  else:
+              #  image_url = None
 
-        return result_image_map
-
+        print("Result: ", hotdeal_result)
+        return hotdeal_result
