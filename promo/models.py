@@ -3,6 +3,20 @@ import uuid
 from django.urls import reverse #Used to generate URLs by reversing the URL patterns
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
+from django.conf import settings
+import boto3
+from django.core.files.base import ContentFile
+import xml.etree.ElementTree as ET
+import requests 
+
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    region_name=settings.AWS_LOCATION  # Используйте AWS_LOCATION вместо AWS_S3_REGION_NAME
+)
+
+
 
 # Create your models here.
 class Advertiser(models.Model):
@@ -12,15 +26,34 @@ class Advertiser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4,
                           help_text="Unique ID for this particular advertiser")
     advertiser_name = models.CharField(max_length=50)
+    advertiser_cpa_url = models.CharField(max_length=500, null=True,blank=True)
     advertiser_image = models.ImageField(upload_to='avertiserimages/', null=True, blank=True)
     advertiser_image_url = models.CharField(max_length=500, null=True,blank=True) # ссылка изображение если его берем с CDN
     advertiser_image_aws = models.ImageField(upload_to='images/', null=True,  blank=True)  # upload_to - папка для хранения файлов на S3
-    advertiser_contact_manager_name = models.CharField(max_length=50)
-    advertiser_contact_email = models.EmailField(max_length=254, null=True)
-    advertiser_contact_phone = models.CharField(max_length=50, null=True)
-    advertiser_country = models.CharField(max_length=50, null=True)
+    advertiser_contact_manager_name = models.CharField(max_length=50, null=True,  blank=True)
+    advertiser_contact_email = models.EmailField(max_length=254, null=True, blank=True)
+    advertiser_contact_phone = models.CharField(max_length=50, null=True, blank=True)
+    advertiser_country = models.CharField(max_length=50, null=True, blank=True)
+    xml_file_url =  models.CharField(max_length=500, null=True,blank=True)
+    xml_file = models.FileField(upload_to='xmls/', null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        if self.xml_file:
+            file = self.xml_file
+            bucket_name = settings.AWS_STORAGE_BUCKET_NAME
+            object_name = f"xmls/{uuid.uuid4()}.xml"  # Путь в вашем bucket на S3
 
+            # Получите бинарные данные файла и создайте ContentFile
+            file_data = file.read()
+            content_file = ContentFile(file_data)
+
+            # Загрузка файла на S3
+            s3_client.upload_fileobj(content_file, bucket_name, object_name)
+
+            # Сохранение URL файла в xml_file_url
+            self.xml_file_url = f"https://{bucket_name}.s3.{settings.AWS_LOCATION}.amazonaws.com/{object_name}"
+
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         """
@@ -82,13 +115,16 @@ class Promocode(models.Model):
     Model representing a specific server (i.e. that can be part of project).
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="Unique ID for promocode")
-    promocode_entity = models.CharField(max_length=20, null=True)
+    promocode_entity = models.CharField(max_length=50, null=True)
+    promocode_external_uid = models.CharField(max_length=20, null=True, blank=True,
+                                             help_text="Unique external ID for promocode")
+
     promocode_url = models.CharField(max_length=500, null=True) # ссылка сайта рекламодателя
     promocode_cpa_url = models.CharField(max_length=500, null=True)  # партнерская ссылка
     promocode_decription = models.CharField(max_length=200, null=True)
     promocode_image = models.ImageField(upload_to='promocodeimages/', null=True, blank=True)
     advertiser = models.ForeignKey(Advertiser, on_delete=models.SET_NULL, null=True,blank=True)
-    promo_company_name = models.ForeignKey(PromoCompany, on_delete=models.SET_NULL, null=True)
+    promo_company_name = models.ForeignKey(PromoCompany, on_delete=models.SET_NULL, null=True,blank=True)
     promocode_valid_from = models.DateField(null=True, blank=True)
     promocode_valid_to = models.DateField(null=True, blank=True)
 

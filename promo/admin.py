@@ -21,17 +21,44 @@ class AdvertiserAdminForm(forms.ModelForm):
         model = Advertiser
         fields = '__all__'
 
+import sys
+from promo.action.xml_parser import XmlParser
+sys.path.append("../promo/action/xml_parser.py")
+from django.contrib import messages
+
+def parse_xml_files(modeladmin, request, queryset):
+    for advertiser in queryset:
+        if advertiser.xml_file_url:
+            parser = XmlParser(advertiser.xml_file_url)
+            try:
+                print("Будем парсить ", advertiser.xml_file_url)
+                parser.parse()
+                messages.success(request, f"Успешный парсинг для {advertiser.advertiser_name}")
+            except Exception as e:
+                messages.error(request, f"Ошибка парсинга для {advertiser.advertiser_name}: {str(e)}")
+        else:
+            messages.error(request, f"У {advertiser.advertiser_name} нет xml_file_url")
+
+# Регистрация действия администратора
+parse_xml_files.short_description = "Распарсить XML файлы для выбранных рекламодателей"
+
 class AdvertiserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'advertiser_name', 'advertiser_contact_manager_name', 'advertiser_contact_email', 'advertiser_contact_phone', 'advertiser_country')
+    list_display = ('id', 'advertiser_name', 'advertiser_contact_manager_name',
+                    'advertiser_contact_email', 'advertiser_contact_phone',
+                    'advertiser_country', 'xml_file_url', 'advertiser_cpa_url')  # Добавьте xml_file_url, если хотите его отображать
+    actions = [parse_xml_files]  # Добавьте действие
     inlines = [PromoCompanyInline, AffiliateLinkInline, PromocodeInline]
     form = AdvertiserAdminForm
 
     fieldsets = (
         (None, {
-            'fields': ('advertiser_name', 'advertiser_contact_manager_name', ('advertiser_contact_email', 'advertiser_contact_phone'), 'advertiser_country')
+            'fields': ('advertiser_name', 'advertiser_cpa_url', 'advertiser_contact_manager_name',
+                       ('advertiser_contact_email', 'advertiser_contact_phone'),
+                       'advertiser_country')
         }),
         ('Images', {
-            'fields': ('advertiser_image', 'advertiser_image_url', 'advertiser_image_aws'),
+            'fields': ('advertiser_image', 'advertiser_image_url', 'advertiser_image_aws', 'xml_file'),
+            # Добавлено 'xml_file' для загрузки XML-файлов
         }),
     )
 
@@ -63,7 +90,7 @@ class PromoCompanyAdmin(admin.ModelAdmin):
 @admin.register(Promocode)
 class PromocodeAdmin(admin.ModelAdmin):
     #form = PromocodeForm
-    list_display = ('id', 'advertiser', 'promocode_decription', 'promocode_cpa_url', 'promocode_url',  'promocode_entity', 'get_status_display',
+    list_display = ('id', 'advertiser', 'promocode_external_uid', 'promocode_decription', 'promocode_cpa_url', 'promocode_url',  'promocode_entity', 'get_status_display',
                     'promocode_valid_from', 'promocode_valid_to')
     pass
     # fields = ['id', 'server_name',  ('ip_address', 'port','server_username'),'Project', 'description', 'due_back', 'status']

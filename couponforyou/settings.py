@@ -166,24 +166,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Импортируйте библиотеку boto3
-import boto3
-
 # Настройки для Amazon S3
 AWS_ACCESS_KEY_ID = 'AKIAWS7CLUU2EGIUQBWE'
 AWS_SECRET_ACCESS_KEY = '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'
 AWS_STORAGE_BUCKET_NAME = 'takeyourpromo'
+AWS_LOCATION = 'eu-central-1'  # Указываете свой регион AWS
 
 # Настройте хранилище для статических и медиа файлов
 STATIC_URL = '/static/'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{AWS_LOCATION}/'  # Убрана дублирующая строка MEDIA_URL
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-# Настройки для автоматического добавления префикса к именам файлов
-AWS_LOCATION = 'media'
-MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{AWS_LOCATION}/'
-
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

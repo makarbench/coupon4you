@@ -34,6 +34,7 @@ from promo import views
 
 urlpatterns += [
     path('extension-data/', views.extension_data_view, name='extension-data'),
+    path('advertisers-list/', views.advertisers_list_view, name='advertisers-list'),
 ]
 
 # Import and include any other custom URL patterns if needed

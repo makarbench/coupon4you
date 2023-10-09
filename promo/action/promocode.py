@@ -93,3 +93,21 @@ class get_affiliatelink_by_site:
 
         print("Result: ", hotdeal_result)
         return hotdeal_result
+
+class get_advertisers_list:
+    def __init__(self, request):
+        self.request = request
+    def get_advertisers_list_from_sql(self):
+        request = self.request
+        print("start advertiser_list")
+        sqlreq = """
+        SELECT advertiser_name, advertiser_image_url, advertiser_cpa_url FROM public.promo_advertiser
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(sqlreq)
+            advertiser_list= cursor.fetchall()
+            print("Список рекламодаелей", advertiser_list)
+        return advertiser_list
+
+
+

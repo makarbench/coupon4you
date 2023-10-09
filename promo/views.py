@@ -58,6 +58,9 @@ sys.path.append("../promo/action/promocode.py")
 from promo.action.promocode import get_affiliatelink_by_site
 sys.path.append("../promo/action/promocode.py")
 
+from promo.action.promocode import get_advertisers_list
+sys.path.append("../promo/action/promocode.py")
+
 @csrf_exempt #отключаем csrf защиту для
 # данных получаемых с расширения, т.к. сейчас передачи конфиденциальных данных не будет.
 # если добавлю авторизацию, то будем использовать  Django REST Framework или JWT
@@ -83,6 +86,25 @@ def extension_data_view(request):
                              'image_url': 'Invalid request method',
                              'message_aflink': 'Invalid request method'
                              })
+
+
+from django.http import JsonResponse
+
+@csrf_exempt
+def advertisers_list_view(request):
+    if request.method == 'GET':
+        print("Hello advertisers-list")
+
+        # Создайте экземпляр класса с передачей объекта request
+        advertiser_list_instance = get_advertisers_list(request)
+
+        # Вызовите метод get_advertisers_list_from_sql для этого экземпляра
+        advertiser_list = advertiser_list_instance.get_advertisers_list_from_sql()
+        print ("Список всех рекламодателей: ", advertiser_list)
+
+        # Возвращаем список в формате JSON
+        return JsonResponse({"advertisers_list": advertiser_list})
+
 
 
 if __name__ == '__main__':
