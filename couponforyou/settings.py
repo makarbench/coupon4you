@@ -167,8 +167,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Импортируйте библиотеку boto3
 # Настройки для Amazon S3
-AWS_ACCESS_KEY_ID = 'AKIAWS7CLUU2EGIUQBWE'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = 'WashigaBarba'
+AWS_SECRET_ACCESS_KEY = 'abrakadabrarabarba'
 AWS_STORAGE_BUCKET_NAME = 'takeyourpromo'
 AWS_LOCATION = 'eu-central-1'  # Указываете свой регион AWS
 
